@@ -233,39 +233,45 @@ pc.flip = function(d) {
 };
 
 pc.commonScale = function(global, type) {
-	var t = type || "number";
-	if (typeof global === 'undefined') {
-		global = true;
-	}
+  var t = type || "number";
+  if (typeof global === 'undefined') {
+    global = true;
+  }
 
-	// scales of the same type
-	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
-		return __.types[p] == t;
-	});
+  // try to autodetect dimensions and create scales
+  if (!d3.keys(__.dimensions).length) {
+    pc.detectDimensions()
+  }
+  pc.autoscale();
 
-	if (global) {
-		var extent = d3.extent(scales.map(function(p,i) {
-				return yscale[p].domain();
-			}).reduce(function(a,b) {
-				return a.concat(b);
-			}));
+  // scales of the same type
+  var scales = d3.keys(__.dimensions).filter(function(p) {
+    return __.dimensions[p].type == t;
+  });
 
-		scales.forEach(function(d) {
-			yscale[d].domain(extent);
-		});
+  if (global) {
+    var extent = d3.extent(scales.map(function(d,i) {
+      return __.dimensions[d].yscale.domain();
+    }).reduce(function(a,b) {
+      return a.concat(b);
+    }));
 
-	} else {
-		scales.forEach(function(k) {
-			yscale[k].domain(d3.extent(__.data, function(d) { return +d[k]; }));
-		});
-	}
+    scales.forEach(function(d) {
+      __.dimensions[d].yscale.domain(extent);
+    });
 
-	// update centroids
-	if (__.bundleDimension !== null) {
-		pc.bundleDimension(__.bundleDimension);
-	}
+  } else {
+    scales.forEach(function(d) {
+      __.dimensions[d].yscale.domain(d3.extent(__.data, function(d) { return +d[k]; }));
+    });
+  }
 
-	return this;
+  // update centroids
+  if (__.bundleDimension !== null) {
+    pc.bundleDimension(__.bundleDimension);
+  }
+
+  return this;
 };pc.detectDimensions = function() {
   pc.types(pc.detectDimensionTypes(__.data));
   pc.dimensions(d3.keys(pc.types()));
