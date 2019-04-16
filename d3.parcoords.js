@@ -524,8 +524,8 @@ function compute_centroids(row) {
 		// centroids on 'real' axes
 		var x = position(p[i]);
 		var y = __.dimensions[p[i]].yscale(row[p[i]]);
-		centroids.push([x, y]);
-    //centroids.push($V([x, y]));
+		//centroids.push([x, y]);
+    centroids.push($V([x, y]));
 
 		// centroids on 'virtual' axes
 		if (i < cols - 1) {
@@ -537,8 +537,8 @@ function compute_centroids(row) {
 				var centroid = 0.5 * (leftCentroid + rightCentroid);
 				cy = centroid + (1 - __.bundlingStrength) * (cy - centroid);
 			}
-			centroids.push([cx, cy]);
-      //centroids.push($V([cx, cy]));
+			//centroids.push([cx, cy]);
+      centroids.push($V([cx, cy]));
 		}
 	}
 
