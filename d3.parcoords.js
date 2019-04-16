@@ -130,7 +130,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     if (flags.interactive){pc.render();}
   })
   .on("hideAxis", function(d) {
-    if (!__.dimensions.length) pc.detectDimensions();
+    pc.dimensions(pc.applyDimensionDefaults());
     pc.dimensions(without(__.dimensions, d.value));
   })
   .on("flipAxes", function(d) {
@@ -180,7 +180,10 @@ function extend(target, source) {
 };
 
 function without(arr, items) {
-  return arr.filter(function(elem) { return items.indexOf(elem) === -1; })
+  items.forEach(function (el) {
+    delete arr[el];
+  });
+  return arr;
 };
 /** adjusts an axis' default range [h()+1, 1] if a NullValueSeparator is set */
 function getRange() {
@@ -521,8 +524,9 @@ function compute_centroids(row) {
 		// centroids on 'real' axes
 		var x = position(p[i]);
 		var y = __.dimensions[p[i]].yscale(row[p[i]]);
-		//centroids.push($V([x, y]));
-    centroids.push([x, y]);
+		centroids.push([x, y]);
+    //centroids.push($V([x, y]));
+
 		// centroids on 'virtual' axes
 		if (i < cols - 1) {
 			var cx = x + a * (position(p[i+1]) - x);
@@ -533,16 +537,14 @@ function compute_centroids(row) {
 				var centroid = 0.5 * (leftCentroid + rightCentroid);
 				cy = centroid + (1 - __.bundlingStrength) * (cy - centroid);
 			}
-      centroids.push([cx, cy]);
-			//centroids.push($V([cx, cy]));
+			centroids.push([cx, cy]);
+      //centroids.push($V([cx, cy]));
 		}
 	}
 
 	return centroids;
 }
-
 pc.compute_centroids = compute_centroids;
-
 pc.compute_real_centroids = function(row) {
 	var realCentroids = [];
 
@@ -561,33 +563,32 @@ pc.compute_real_centroids = function(row) {
 
 function compute_control_points(centroids) {
 
-  var cols = centroids.length;
-  var a = __.smoothness;
-  var cps = [];
+	var cols = centroids.length;
+	var a = __.smoothness;
+	var cps = [];
 
-  cps.push(centroids[0]);
-  cps.push($V([centroids[0].e(1) + a*2*(centroids[1].e(1)-centroids[0].e(1)), centroids[0].e(2)]));
-  for (var col = 1; col < cols - 1; ++col) {
-    var mid = centroids[col];
-    var left = centroids[col - 1];
-    var right = centroids[col + 1];
+	cps.push(centroids[0]);
+	cps.push($V([centroids[0].e(1) + a*2*(centroids[1].e(1)-centroids[0].e(1)), centroids[0].e(2)]));
+	for (var col = 1; col < cols - 1; ++col) {
+		var mid = centroids[col];
+		var left = centroids[col - 1];
+		var right = centroids[col + 1];
 
-    var diff = left.subtract(right);
-    cps.push(mid.add(diff.x(a)));
-    cps.push(mid);
-    cps.push(mid.subtract(diff.x(a)));
-  }
-  cps.push($V([centroids[cols-1].e(1) + a*2*(centroids[cols-2].e(1)-centroids[cols-1].e(1)), centroids[cols-1].e(2)]));
-  cps.push(centroids[cols - 1]);
+		var diff = left.subtract(right);
+		cps.push(mid.add(diff.x(a)));
+		cps.push(mid);
+		cps.push(mid.subtract(diff.x(a)));
+	}
+	cps.push($V([centroids[cols-1].e(1) + a*2*(centroids[cols-2].e(1)-centroids[cols-1].e(1)), centroids[cols-1].e(2)]));
+	cps.push(centroids[cols - 1]);
 
-  return cps;
+	return cps;
 
 };pc.shadows = function() {
-  flags.shadows = true;
-  if (__.data.length > 0) {
-    paths(__.data, ctx.shadows);
-  }
-  return this;
+	flags.shadows = true;
+	pc.alphaOnBrushed(0.1);
+	pc.render();
+	return this;
 };
 
 // draw dots with radius r on the axis line where data intersects
