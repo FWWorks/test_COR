@@ -130,7 +130,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     if (flags.interactive){pc.render();}
   })
   .on("hideAxis", function(d) {
-    pc.dimensions(pc.applyDimensionDefaults());
+    if (!__.dimensions.length) pc.detectDimensions();
     pc.dimensions(without(__.dimensions, d.value));
   })
   .on("flipAxes", function(d) {
