@@ -1,3 +1,6 @@
+//this file combines mostapha's work with syntagmatic's to fix mostapha's not supporting commonScale well. 
+//citiations : https://syntagmatic.github.io/parallel-coordinates/d3.parcoords.js
+//citiations : https://www.mostapha.io/honeybee/pc_source_files/d3/d3.parcoords.js
 d3.parcoords = function(config) {
   var __ = {
     data: [],
