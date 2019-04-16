@@ -544,7 +544,7 @@ function compute_centroids(row) {
 
 	return centroids;
 }
-
+pc.compute_centroids = compute_centroids;
 pc.compute_real_centroids = function(row) {
 	var realCentroids = [];
 
@@ -560,7 +560,7 @@ pc.compute_real_centroids = function(row) {
 
 	return realCentroids;
 }
-pc.compute_centroids = compute_centroids;
+
 function compute_control_points(centroids) {
 
 	var cols = centroids.length;
