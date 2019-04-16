@@ -180,10 +180,7 @@ function extend(target, source) {
 };
 
 function without(arr, items) {
-  items.forEach(function (el) {
-    delete arr[el];
-  });
-  return arr;
+  return arr.filter(function(elem) { return item.indexOf(elem) === -1; })
 };
 /** adjusts an axis' default range [h()+1, 1] if a NullValueSeparator is set */
 function getRange() {
